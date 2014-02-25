@@ -1,8 +1,8 @@
 package main.java.google.pagerank;
 
-import java.net.URLConnection;
-import java.net.URL;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Random;
 
 /**
