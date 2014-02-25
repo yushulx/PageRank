@@ -1,10 +1,19 @@
 package com.main;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.Iterator;
+
 import main.java.google.pagerank.PageRank;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.common.Utils;
-import com.smartxls.WorkBook;
 
 public class ExcelOperator extends Operator {
 
@@ -14,38 +23,48 @@ public class ExcelOperator extends Operator {
 
 	@Override
 	public void getPageRank() {
-		// TODO Auto-generated method stub
-		File file =  new File(mFileName);
-		if (file.exists()) {
-			WorkBook workbook = new WorkBook();
-			try {
-				workbook.readXLSX(mFileName);
-				int row = 0, col = 0, colPR = 1;
-				int pageRank = 0;
-				String url = null;
-				
-				while (!(url = workbook.getText(row, col)).equals("")) {
-					if (url.matches(Utils.REGEX)) { // check whether URL is valid
-						System.out.println(url);
-						pageRank = PageRank.get(url); // check page rank
-						workbook.setText(row, colPR, String.valueOf(pageRank)); // write PageRank to excel
-						System.out.println("PR = " + pageRank);
-					}
-					else {
-						System.out.println("URL not valid");
-					}
+		// TODO Auto-generated method stub		
+		try {
+			InputStream excelFile = new FileInputStream(mFileName);
+			XSSFWorkbook wb = new XSSFWorkbook(excelFile);
+			XSSFSheet sheet = wb.getSheetAt(0);
+			XSSFRow row;
+			XSSFCell cell;
+
+			Iterator<Row> rows = sheet.rowIterator();
+
+			int col = 0, colPR = 1;
+			int pageRank = 0;
+			String url = null;
+			
+			while (rows.hasNext()) {
+				row = (XSSFRow) rows.next();
+				url = row.getCell(col).getStringCellValue();
+				if (url.matches(Utils.REGEX)) { // check whether URL is valid
+					System.out.println(url);
+					pageRank = PageRank.get(url); // check page rank
 					
-					System.out.println("--------------------------");
+					// write PageRank to excel
+					cell = row.createCell(colPR);
+					cell.setCellValue(pageRank);
 					
-					++row;
+					System.out.println("PR = " + pageRank);
+				}
+				else {
+					System.out.println("URL not valid");
 				}
 				
-				workbook.writeXLSX(mFileName);
+				System.out.println("--------------------------");
 			}
-			catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			FileOutputStream out = new FileOutputStream(mFileName);
+	        wb.write(out);
+	        out.flush();
+	        out.close();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
