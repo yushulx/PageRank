@@ -8,6 +8,7 @@ import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import main.java.google.pagerank.PageRank;
 
 import com.main.ExcelOperator;
 import com.main.TextOperator;
@@ -27,9 +30,10 @@ import com.main.TextOperator;
 public class FileChooserDemo extends JPanel
                              implements ActionListener {
     static private final String newline = "\n";
-    JButton openButton;
+    JButton mOpenButton, mCheckButton;
     JTextArea log;
     JFileChooser fc;
+    JEditorPane mEditText;
  
     public FileChooserDemo() {
         super(new BorderLayout());
@@ -56,14 +60,19 @@ public class FileChooserDemo extends JPanel
  
         //Create the open button.  We use the image from the JLF
         //Graphics Repository (but we extracted it from the jar).
-        openButton = new JButton("Open a File...");
-        openButton.addActionListener(this);
+        mOpenButton = new JButton("Open a File...");
+        mOpenButton.addActionListener(this);
 
- 
+        mCheckButton = new JButton("Check PR");
+        mCheckButton.addActionListener(this);
         //For layout purposes, put the buttons in a separate panel
         JPanel buttonPanel = new JPanel(); //use FlowLayout
-        buttonPanel.add(openButton);
- 
+        mEditText = new JEditorPane();
+
+        buttonPanel.add(mEditText);
+        buttonPanel.add(mCheckButton);
+		buttonPanel.add(mOpenButton);
+        
         //Add the buttons and the log to this panel.
         add(buttonPanel, BorderLayout.PAGE_START);
         add(logScrollPane, BorderLayout.CENTER);
@@ -72,7 +81,7 @@ public class FileChooserDemo extends JPanel
     public void actionPerformed(ActionEvent e) {
  
         //Handle open button action.
-        if (e.getSource() == openButton) {
+        if (e.getSource() == mOpenButton) {
             int returnVal = fc.showOpenDialog(FileChooserDemo.this);
  
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -99,6 +108,18 @@ public class FileChooserDemo extends JPanel
             }
             log.setCaretPosition(log.getDocument().getLength());
         } 
+        else if (e.getSource() == mCheckButton) {
+        	String url = mEditText.getText();
+        	String tmpURL = url;
+        	if (url != null && !url.equals("")) {
+        		if (!url.startsWith("http")) {
+        			tmpURL = "http://" + url;
+        		}
+        		
+        		int pageRank = PageRank.get(tmpURL);
+        		log.append(url + ": PR = " + pageRank + newline);
+        	}
+        }
     }
  
     /** Returns an ImageIcon, or null if the path was invalid. */
