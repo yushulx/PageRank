@@ -92,11 +92,11 @@ public class FileChooserDemo extends JPanel
                 
                 // only text files or excel files
                 if (fileName.endsWith("txt")) {
-                	 TextOperator text = new TextOperator("urls.txt");
+                	 TextOperator text = new TextOperator(file.toString());
             		 text.getPageRank();
                 }
                 else if (fileName.endsWith("xlsx")) {
-                	ExcelOperator excel = new ExcelOperator("urls.xlsx"); 
+                	ExcelOperator excel = new ExcelOperator(file.toString()); 
             		excel.getPageRank();
                 }
                 else {
