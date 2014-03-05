@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.alexarank.AlexaRank;
 import com.common.Utils;
 
 import main.java.google.pagerank.PageRank;
@@ -17,7 +18,7 @@ public class TextOperator extends Operator {
 	}
 	
 	@Override
-	public void getPageRank() {
+	public void getPageRankAndAlexaRank() {
 		File file =  new File(mFileName);
 		if (file.exists()) {
 			BufferedReader reader = null;
@@ -25,13 +26,14 @@ public class TextOperator extends Operator {
 				reader = new BufferedReader(new FileReader(file));
 				try {
 					String url = null;
-					int pageRank = 0;
+					int pageRank = 0, alexaRank = 0;
 
 					while ((url = reader.readLine()) != null) {
 						if (url.matches(Utils.REGEX)) { // check whether URL is valid
 							System.out.println(url);
 							pageRank = PageRank.get(url); // check page rank
-							System.out.println("PR = " + pageRank);
+							alexaRank = AlexaRank.getAlexaRank(url);
+							System.out.println("PR = " + pageRank + ", AR = " + alexaRank);
 						}
 						else {
 							System.out.println("URL not valid");

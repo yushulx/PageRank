@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.alexarank.AlexaRank;
 import com.common.Utils;
 
 public class ExcelOperator extends Operator {
@@ -22,20 +23,21 @@ public class ExcelOperator extends Operator {
 	}
 
 	@Override
-	public void getPageRank() {
+	public void getPageRankAndAlexaRank() {
 		// TODO Auto-generated method stub		
 		try {
 			InputStream excelFile = new FileInputStream(mFileName);
 			XSSFWorkbook wb = new XSSFWorkbook(excelFile);
 			XSSFSheet sheet = wb.getSheetAt(0);
 			XSSFRow row;
-			XSSFCell cell;
+			XSSFCell cellPR, cellAR;
 
 			Iterator<Row> rows = sheet.rowIterator();
 
-			int col = 0, colPR = 1;
-			int pageRank = 0;
+			int col = 0, colPR = 1, colAR = 2;
+			int pageRank = 0, alexaRank = 0;
 			String url = null;
+			String log = null;
 			
 			while (rows.hasNext()) {
 				row = (XSSFRow) rows.next();
@@ -43,12 +45,20 @@ public class ExcelOperator extends Operator {
 				if (url.matches(Utils.REGEX)) { // check whether URL is valid
 					System.out.println(url);
 					pageRank = PageRank.get(url); // check page rank
+					alexaRank = AlexaRank.getAlexaRank(url); // get alexa rank
 					
 					// write PageRank to excel
-					cell = row.createCell(colPR);
-					cell.setCellValue(pageRank);
+					cellPR = row.createCell(colPR);
+					cellPR.setCellValue(pageRank);
 					
-					System.out.println("PR = " + pageRank);
+					cellAR = row.createCell(colAR);
+					cellAR.setCellValue(alexaRank);
+					
+					log = "PR = " + pageRank + ", AR = " + alexaRank;
+					if (mEventListener != null) {
+						mEventListener.log(log);
+					}
+					System.out.println(log);
 				}
 				else {
 					System.out.println("URL not valid");

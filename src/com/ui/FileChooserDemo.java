@@ -20,7 +20,9 @@ import javax.swing.UIManager;
 
 import main.java.google.pagerank.PageRank;
 
+import com.alexarank.AlexaRank;
 import com.main.ExcelOperator;
+import com.main.Operator.EventListener;
 import com.main.TextOperator;
  
 /*
@@ -28,10 +30,10 @@ import com.main.TextOperator;
  * http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemoProject/src/components/FileChooserDemo.java
  */
 public class FileChooserDemo extends JPanel
-                             implements ActionListener {
+                             implements ActionListener, EventListener {
     static private final String newline = "\n";
     JButton mOpenButton, mCheckButton;
-    JTextArea log;
+    JTextArea mLog;
     JFileChooser fc;
     JEditorPane mEditText;
  
@@ -40,10 +42,10 @@ public class FileChooserDemo extends JPanel
  
         //Create the log first, because the action listeners
         //need to refer to it.
-        log = new JTextArea(5,20);
-        log.setMargin(new Insets(5,5,5,5));
-        log.setEditable(false);
-        JScrollPane logScrollPane = new JScrollPane(log);
+        mLog = new JTextArea(5,20);
+        mLog.setMargin(new Insets(5,5,5,5));
+        mLog.setEditable(false);
+        JScrollPane logScrollPane = new JScrollPane(mLog);
  
         //Create a file chooser
         fc = new JFileChooser();
@@ -63,7 +65,7 @@ public class FileChooserDemo extends JPanel
         mOpenButton = new JButton("Open a File...");
         mOpenButton.addActionListener(this);
 
-        mCheckButton = new JButton("Check PR");
+        mCheckButton = new JButton("Check PR & AR");
         mCheckButton.addActionListener(this);
         //For layout purposes, put the buttons in a separate panel
         JPanel buttonPanel = new JPanel(); //use FlowLayout
@@ -88,36 +90,46 @@ public class FileChooserDemo extends JPanel
                 File file = fc.getSelectedFile();
                 //This is where a real application would open the file.
                 String fileName = file.getName();
-                log.append("Opening: " + fileName + "." + newline);
+                mLog.append("Opening: " + fileName + "." + newline);
                 
                 // only text files or excel files
                 if (fileName.endsWith("txt")) {
                 	 TextOperator text = new TextOperator(file.toString());
-            		 text.getPageRank();
+            		 text.getPageRankAndAlexaRank();
                 }
                 else if (fileName.endsWith("xlsx")) {
-                	ExcelOperator excel = new ExcelOperator(file.toString()); 
-            		excel.getPageRank();
+                	final ExcelOperator excel = new ExcelOperator(file.toString()); 
+                	excel.registerEventLister(this);
+                	new Thread(new Runnable(){
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							excel.getPageRankAndAlexaRank();
+						}
+                		
+                	}).start();
                 }
                 else {
                 	JOptionPane.showMessageDialog(null, "Not Supported !");
                 }
                 
             } else {
-                log.append("Open command cancelled by user." + newline);
+                mLog.append("Open command cancelled by user." + newline);
             }
-            log.setCaretPosition(log.getDocument().getLength());
+            mLog.setCaretPosition(mLog.getDocument().getLength());
         } 
         else if (e.getSource() == mCheckButton) {
         	String url = mEditText.getText();
-        	String tmpURL = url;
+        	String tmpURL = url.trim();
         	if (url != null && !url.equals("")) {
         		if (!url.startsWith("http")) {
         			tmpURL = "http://" + url;
         		}
         		
         		int pageRank = PageRank.get(tmpURL);
-        		log.append(url + ": PR = " + pageRank + newline);
+        		int alexRank = AlexaRank.getAlexaRank(tmpURL);
+        		mLog.append(url + ": PageRank = " + pageRank + "; Alexa rank = " + alexRank + newline);
         	}
         }
     }
@@ -162,4 +174,12 @@ public class FileChooserDemo extends JPanel
             }
         });
     }
+
+	@Override
+	public void log(String log) {
+		// TODO Auto-generated method stub
+		if (mLog != null) {
+			mLog.append(log + newline);
+		}
+	}
 }
