@@ -126,10 +126,19 @@ public class FileChooserDemo extends JPanel
         		if (!url.startsWith("http")) {
         			tmpURL = "http://" + url;
         		}
-        		
-        		int pageRank = PageRank.get(tmpURL);
-        		int alexRank = AlexaRank.getAlexaRank(tmpURL);
-        		mLog.append(url + ": PageRank = " + pageRank + "; Alexa rank = " + alexRank + newline);
+        		final String finalURL = tmpURL;
+        		final String logURL = url;
+        		new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						int pageRank = PageRank.get(finalURL);
+		        		int alexRank = AlexaRank.getAlexaRank(finalURL);
+		        		mLog.append(logURL + ": PageRank = " + pageRank + "; Alexa rank = " + alexRank + newline);
+					}
+            		
+            	}).start();
         	}
         }
     }
