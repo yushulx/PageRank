@@ -2,7 +2,7 @@ package com.main;
 
 public class Main {
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 		// TextOperator text = new TextOperator("urls.txt");
@@ -10,6 +10,6 @@ public class Main {
 
 		ExcelOperator excel = new ExcelOperator("urls.xlsx"); 
 		excel.getPageRank();
-	}
+	}*/
 
 }
