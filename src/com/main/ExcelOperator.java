@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 
 import com.alexarank.AlexaRank;
+import com.common.Strings;
 import com.common.Utils;
 
 public class ExcelOperator extends Operator {
@@ -84,10 +85,10 @@ public class ExcelOperator extends Operator {
 	         *  Record file history in JSON
 	         */
 	        JSONObject obj = new JSONObject();
-	        obj.put(Utils.JSON_KEY_PATH, mFileName);
+	        obj.put(Strings.JSON_KEY_PATH, mFileName);
 	        
 	        try {
-	        	File config = new File(Utils.FILE_CONFIG);
+	        	File config = new File(Strings.FILE_CONFIG);
 				if (!config.exists()) {
 					config.createNewFile();
 				}

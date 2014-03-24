@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.alexarank.AlexaRank;
+import com.common.Strings;
 import com.common.Utils;
 import com.main.ExcelOperator;
 import com.main.Operator.EventListener;
@@ -42,12 +43,12 @@ public class FileChooserDemo extends JPanel
     static private final String newline = "\n";
     JButton mOpenButton, mCheckButton;
     JTextArea mLog;
-    JFileChooser fc;
+    JFileChooser mFileChooser;
     JEditorPane mEditText;
  
     public FileChooserDemo() {
         super(new BorderLayout());
- 
+        
         //Create the log first, because the action listeners
         //need to refer to it.
         mLog = new JTextArea(5,20);
@@ -56,10 +57,10 @@ public class FileChooserDemo extends JPanel
         JScrollPane logScrollPane = new JScrollPane(mLog);
  
         //Create a file chooser
-        fc = new JFileChooser();
+        mFileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 ".xlsx", "xlsx");
-        fc.setFileFilter(filter);
+        mFileChooser.setFileFilter(filter);
         //Uncomment one of the following lines to try a different
         //file selection mode.  The first allows just directories
         //to be selected (and, at least in the Java look and feel,
@@ -95,14 +96,14 @@ public class FileChooserDemo extends JPanel
         //Handle open button action.
         if (e.getSource() == mOpenButton) {
 			try {
-				File config = new File(Utils.FILE_CONFIG);
+				File config = new File(Strings.FILE_CONFIG);
 				if (config.exists()) {	// read the file history
 					FileReader reader = new FileReader(config);
 					JSONTokener tokener = new JSONTokener(reader);
 					JSONObject obj = new JSONObject(tokener);
-		        	String path = obj.getString(Utils.JSON_KEY_PATH);
+		        	String path = obj.getString(Strings.JSON_KEY_PATH);
 		        	if (path != null && new File(path).exists()) {
-		        		fc.setCurrentDirectory(new File(path));
+		        		mFileChooser.setCurrentDirectory(new File(path));
 		        	}
 				}
 				else {
@@ -119,10 +120,10 @@ public class FileChooserDemo extends JPanel
 				e1.printStackTrace();
 			}
 	        
-            int returnVal = fc.showOpenDialog(FileChooserDemo.this);
+            int returnVal = mFileChooser.showOpenDialog(FileChooserDemo.this);
  
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
+                File file = mFileChooser.getSelectedFile();
                 //This is where a real application would open the file.
                 String fileName = file.getName();
                 mLog.append("Opening: " + fileName + "." + newline);
@@ -196,7 +197,7 @@ public class FileChooserDemo extends JPanel
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("FileChooserDemo");
+        JFrame frame = new JFrame(Strings.APP_NAME);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Add content to the window.
