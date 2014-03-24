@@ -5,6 +5,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,10 +20,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import main.java.google.pagerank.PageRank;
 
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.alexarank.AlexaRank;
+import com.common.Utils;
 import com.main.ExcelOperator;
 import com.main.Operator.EventListener;
 import com.main.TextOperator;
@@ -49,7 +57,9 @@ public class FileChooserDemo extends JPanel
  
         //Create a file chooser
         fc = new JFileChooser();
- 
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                ".xlsx", "xlsx");
+        fc.setFileFilter(filter);
         //Uncomment one of the following lines to try a different
         //file selection mode.  The first allows just directories
         //to be selected (and, at least in the Java look and feel,
@@ -84,6 +94,31 @@ public class FileChooserDemo extends JPanel
  
         //Handle open button action.
         if (e.getSource() == mOpenButton) {
+			try {
+				File config = new File(Utils.FILE_CONFIG);
+				if (config.exists()) {	// read the file history
+					FileReader reader = new FileReader(config);
+					JSONTokener tokener = new JSONTokener(reader);
+					JSONObject obj = new JSONObject(tokener);
+		        	String path = obj.getString(Utils.JSON_KEY_PATH);
+		        	if (path != null && new File(path).exists()) {
+		        		fc.setCurrentDirectory(new File(path));
+		        	}
+				}
+				else {
+					try {
+						config.createNewFile();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        
             int returnVal = fc.showOpenDialog(FileChooserDemo.this);
  
             if (returnVal == JFileChooser.APPROVE_OPTION) {

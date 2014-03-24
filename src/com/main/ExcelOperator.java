@@ -1,7 +1,10 @@
 package com.main;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -12,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONObject;
 
 import com.alexarank.AlexaRank;
 import com.common.Utils;
@@ -71,6 +75,31 @@ public class ExcelOperator extends Operator {
 	        wb.write(out);
 	        out.flush();
 	        out.close();
+	        
+	        if (mEventListener != null) {
+				mEventListener.log("Done!");
+			}
+	        
+	        /*
+	         *  Record file history in JSON
+	         */
+	        JSONObject obj = new JSONObject();
+	        obj.put(Utils.JSON_KEY_PATH, mFileName);
+	        
+	        try {
+	        	File config = new File(Utils.FILE_CONFIG);
+				if (!config.exists()) {
+					config.createNewFile();
+				}
+				
+	    		FileWriter writer = new FileWriter(config);
+	    		writer.write(obj.toString());
+	    		writer.flush();
+	    		writer.close();
+	     
+	    	} catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
