@@ -29,7 +29,8 @@ import org.json.JSONTokener;
 
 import com.alexarank.AlexaRank;
 import com.common.Strings;
-import com.common.Utils;
+import com.data.HistoryManager;
+import com.data.HistoryData;
 import com.main.ExcelOperator;
 import com.main.Operator.EventListener;
 import com.main.TextOperator;
@@ -45,6 +46,7 @@ public class FileChooserDemo extends JPanel
     JTextArea mLog;
     JFileChooser mFileChooser;
     JEditorPane mEditText;
+    private HistoryManager mHistoryManager;
  
     public FileChooserDemo() {
         super(new BorderLayout());
@@ -89,6 +91,9 @@ public class FileChooserDemo extends JPanel
         //Add the buttons and the log to this panel.
         add(buttonPanel, BorderLayout.PAGE_START);
         add(logScrollPane, BorderLayout.CENTER);
+        
+        // initialize HistoryManager
+        mHistoryManager = new HistoryManager(Strings.FILE_HISTORY_EXCEL);
     }
  
     public void actionPerformed(ActionEvent e) {
@@ -170,8 +175,13 @@ public class FileChooserDemo extends JPanel
 					public void run() {
 						// TODO Auto-generated method stub
 						int pageRank = PageRank.get(finalURL);
-		        		int alexRank = AlexaRank.getAlexaRank(finalURL);
-		        		mLog.append(logURL + ": PageRank = " + pageRank + "; Alexa rank = " + alexRank + newline);
+		        		int alexaRank = AlexaRank.getAlexaRank(finalURL);
+		        		String finalInfo = logURL + ": PageRank = " + pageRank + "; Alexa rank = " + alexaRank + newline;
+		        		mLog.append(finalInfo);
+		        		
+		        		// write result to file
+//		        		mHistoryManager.saveToTextFile(new HistoryData(logURL, pageRank, alexaRank));
+		        		mHistoryManager.saveToExcelFile(new HistoryData(logURL, pageRank, alexaRank));
 					}
             		
             	}).start();
