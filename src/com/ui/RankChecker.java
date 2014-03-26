@@ -39,7 +39,7 @@ import com.main.TextOperator;
  * FileChooserDemo.java uses these files:
  * http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/FileChooserDemoProject/src/components/FileChooserDemo.java
  */
-public class FileChooserDemo extends JPanel
+public class RankChecker extends JPanel
                              implements ActionListener, EventListener {
     static private final String newline = "\n";
     JButton mOpenButton, mCheckButton;
@@ -48,7 +48,7 @@ public class FileChooserDemo extends JPanel
     JEditorPane mEditText;
     private HistoryManager mHistoryManager;
  
-    public FileChooserDemo() {
+    public RankChecker() {
         super(new BorderLayout());
         
         //Create the log first, because the action listeners
@@ -125,7 +125,7 @@ public class FileChooserDemo extends JPanel
 				e1.printStackTrace();
 			}
 	        
-            int returnVal = mFileChooser.showOpenDialog(FileChooserDemo.this);
+            int returnVal = mFileChooser.showOpenDialog(RankChecker.this);
  
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = mFileChooser.getSelectedFile();
@@ -191,7 +191,7 @@ public class FileChooserDemo extends JPanel
  
     /** Returns an ImageIcon, or null if the path was invalid. */
     protected static ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = FileChooserDemo.class.getResource(path);
+        java.net.URL imgURL = RankChecker.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
@@ -211,7 +211,7 @@ public class FileChooserDemo extends JPanel
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Add content to the window.
-        frame.add(new FileChooserDemo());
+        frame.add(new RankChecker());
  
         //Display the window.
         frame.pack();
