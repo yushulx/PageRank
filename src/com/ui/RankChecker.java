@@ -1,6 +1,8 @@
 package com.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,8 +31,9 @@ import org.json.JSONTokener;
 
 import com.alexarank.AlexaRank;
 import com.common.Strings;
-import com.data.HistoryManager;
+import com.common.Utils;
 import com.data.HistoryData;
+import com.data.HistoryManager;
 import com.main.ExcelOperator;
 import com.main.Operator.EventListener;
 import com.main.TextOperator;
@@ -42,7 +45,7 @@ import com.main.TextOperator;
 public class RankChecker extends JPanel
                              implements ActionListener, EventListener {
     static private final String newline = "\n";
-    JButton mOpenButton, mCheckButton;
+    JButton mOpenButton, mCheckButton, mHistoryButton;
     JTextArea mLog;
     JFileChooser mFileChooser;
     JEditorPane mEditText;
@@ -75,17 +78,23 @@ public class RankChecker extends JPanel
  
         //Create the open button.  We use the image from the JLF
         //Graphics Repository (but we extracted it from the jar).
-        mOpenButton = new JButton("Open a File...");
+        mOpenButton = new JButton(Strings.BUTTON_OPEN_FILE);
         mOpenButton.addActionListener(this);
 
-        mCheckButton = new JButton("Check PR & AR");
+        mCheckButton = new JButton(Strings.BUTTON_CHECK_RANK);
         mCheckButton.addActionListener(this);
+        
+        mHistoryButton = new JButton(Strings.BUTTON_OPEN_HISTORY);
+        mHistoryButton.addActionListener(this);
+        
         //For layout purposes, put the buttons in a separate panel
         JPanel buttonPanel = new JPanel(); //use FlowLayout
         mEditText = new JEditorPane();
+        mEditText.setSize(200, 10);
 
         buttonPanel.add(mEditText);
         buttonPanel.add(mCheckButton);
+        buttonPanel.add(mHistoryButton);
 		buttonPanel.add(mOpenButton);
         
         //Add the buttons and the log to this panel.
@@ -152,7 +161,7 @@ public class RankChecker extends JPanel
                 	}).start();
                 }
                 else {
-                	JOptionPane.showMessageDialog(null, "Not Supported !");
+                	JOptionPane.showMessageDialog(null, Strings.MSG_WARNING_NOT_SUPPORTED);
                 }
                 
             } else {
@@ -161,6 +170,7 @@ public class RankChecker extends JPanel
             mLog.setCaretPosition(mLog.getDocument().getLength());
         } 
         else if (e.getSource() == mCheckButton) {
+        	Utils.startProcessing(this); // start processing
         	String url = mEditText.getText();
         	String tmpURL = url.trim();
         	if (url != null && !url.equals("")) {
@@ -182,10 +192,28 @@ public class RankChecker extends JPanel
 		        		// write result to file
 //		        		mHistoryManager.saveToTextFile(new HistoryData(logURL, pageRank, alexaRank));
 		        		mHistoryManager.saveToExcelFile(new HistoryData(logURL, pageRank, alexaRank));
+		        		Utils.stopProcessing(RankChecker.this); // stop processing
 					}
             		
             	}).start();
         	}
+        }
+        /*
+    	 *  Open the history file if it exists
+    	 */
+        else if (e.getSource() == mHistoryButton) {
+			if (!Desktop.isDesktopSupported()) {
+				JOptionPane.showMessageDialog(null, Strings.MSG_WARNING_DESKTOP);
+				return;
+			}
+			
+			File file = new File(Strings.FILE_HISTORY_EXCEL);
+			if (file.exists()) {
+				Utils.openFile(file);
+			}
+			else {
+				JOptionPane.showMessageDialog(null, Strings.MSG_WARNING_NO_FILE);
+			}
         }
     }
  
