@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -244,6 +245,12 @@ public class RankChecker extends JPanel
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+        
+        double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        int frameWidth = frame.getWidth();
+        int frameHeight = frame.getHeight();
+        frame.setLocation((int)(width - frameWidth) / 2, (int)(height - frameHeight) / 2);
     }
  
     public static void main(String[] args) {
