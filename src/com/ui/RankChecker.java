@@ -245,12 +245,19 @@ public class RankChecker extends JPanel
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+        frame.setResizable(false);
         
-        double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        
+        double width = Utils.getScreenWidth();
+        double height = Utils.getScreenHeight();
         int frameWidth = frame.getWidth();
         int frameHeight = frame.getHeight();
         frame.setLocation((int)(width - frameWidth) / 2, (int)(height - frameHeight) / 2);
+        
+        MenuManager menuManager = new MenuManager(frame);
+        frame.setJMenuBar(menuManager.getMenuBar());
+        
+        frame.setSize(600, (int)height / 2);
     }
  
     public static void main(String[] args) {
