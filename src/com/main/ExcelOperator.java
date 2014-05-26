@@ -10,6 +10,9 @@ import java.util.Iterator;
 
 import main.java.google.pagerank.PageRank;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -44,17 +47,36 @@ public class ExcelOperator extends Operator {
 			String url = null;
 			String log = null;
 			
+			// style for PR >= 5
+			CellStyle cs = wb.createCellStyle();
+			cs.setFillForegroundColor(HSSFColor.GREEN.index);
+			cs.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+			
+			int sumPR5 = 0;
+			int rowIndex = 0;
+			XSSFCell tmpCell;
+			
 			while (rows.hasNext()) {
+				++rowIndex;
 				row = (XSSFRow) rows.next();
-				url = row.getCell(col).getStringCellValue();
+				tmpCell = row.getCell(col);
+				if (tmpCell == null || tmpCell.equals(""))
+					break;
+
+				url = tmpCell.getStringCellValue();
+				System.out.println("URL: " + url);
+				
 				if (url.matches(Utils.REGEX)) { // check whether URL is valid
-					System.out.println(url);
 					pageRank = PageRank.get(url); // check page rank
 					alexaRank = AlexaRank.getAlexaRank(url); // get alexa rank
 					
 					// write PageRank to excel
 					cellPR = row.createCell(colPR);
 					cellPR.setCellValue(pageRank);
+					if (pageRank >= 5) {
+						cellPR.setCellStyle(cs);
+						sumPR5 += 1;
+					}
 					
 					cellAR = row.createCell(colAR);
 					cellAR.setCellValue(alexaRank);
@@ -72,6 +94,13 @@ public class ExcelOperator extends Operator {
 				System.out.println("--------------------------");
 			}
 			
+			// create a row for sum
+			row = sheet.createRow(rowIndex);
+			cellPR = row.createCell(colPR);
+			String sPRTotal = ">=PR5 total: " + sumPR5;
+			cellPR.setCellValue(sPRTotal);
+			System.out.println("Done! " + sPRTotal);
+					
 			FileOutputStream out = new FileOutputStream(mFileName);
 	        wb.write(out);
 	        out.flush();
