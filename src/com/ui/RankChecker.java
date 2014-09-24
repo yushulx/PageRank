@@ -1,10 +1,8 @@
 package com.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -35,6 +33,8 @@ import com.common.Strings;
 import com.common.Utils;
 import com.data.HistoryData;
 import com.data.HistoryManager;
+import com.geo.Geo;
+import com.geo.GeoManager;
 import com.main.ExcelOperator;
 import com.main.Operator.EventListener;
 import com.main.TextOperator;
@@ -172,7 +172,10 @@ public class RankChecker extends JPanel
         } 
         else if (e.getSource() == mCheckButton) {
         	Utils.startProcessing(this); // start processing
-        	String url = mEditText.getText();
+        	final String url = mEditText.getText();
+        	if (url.equals(""))
+        		return;
+        	
         	String tmpURL = url.trim();
         	if (url != null && !url.equals("")) {
         		if (!url.startsWith("http")) {
@@ -185,14 +188,20 @@ public class RankChecker extends JPanel
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
+						Geo geo = GeoManager.cityCheck(url);
 						int pageRank = PageRank.get(finalURL);
 		        		int alexaRank = AlexaRank.getAlexaRank(finalURL);
-		        		String finalInfo = logURL + ": PageRank = " + pageRank + "; Alexa rank = " + alexaRank + newline;
+		        		
+		        		String finalInfo = logURL 
+		        				+ ": PageRank = " + pageRank 
+		        				+ ", Alexa rank = " + alexaRank 
+		        				+ ", country = " + geo.country 
+		        				+ ", city = " + geo.city + newline;
 		        		mLog.append(finalInfo);
 		        		
 		        		// write result to file
 //		        		mHistoryManager.saveToTextFile(new HistoryData(logURL, pageRank, alexaRank));
-		        		mHistoryManager.saveToExcelFile(new HistoryData(logURL, pageRank, alexaRank));
+		        		mHistoryManager.saveToExcelFile(new HistoryData(logURL, pageRank, alexaRank, geo.country, geo.city));
 		        		Utils.stopProcessing(RankChecker.this); // stop processing
 					}
             		

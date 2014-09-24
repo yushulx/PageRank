@@ -68,6 +68,10 @@ public class HistoryManager {
 				cell.setCellValue("PageRank");
 				cell = row.createCell(2);
 				cell.setCellValue("AlexaRank");
+				cell = row.createCell(3);
+				cell.setCellValue("Country");
+				cell = row.createCell(4);
+				cell.setCellValue("City");
 				
 				row = sheet.createRow(1);
 			}
@@ -84,6 +88,12 @@ public class HistoryManager {
 			cell.setCellValue(data.getPageRank());
 			cell = row.createCell(2);
 			cell.setCellValue(data.getAlexaRank());
+			
+			cell = row.createCell(3);
+			cell.setCellValue(data.getCountry());
+			
+			cell = row.createCell(4);
+			cell.setCellValue(data.getCity());
 			
 			FileOutputStream out = new FileOutputStream(mFile);
 	        wb.write(out);
